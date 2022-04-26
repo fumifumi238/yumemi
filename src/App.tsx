@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchApi } from "./api/api";
 import "./App.css";
-
+import Rechart from "./components/rechart";
 type Prefecture = {
   prefCode: number;
   prefName: string;
@@ -38,7 +38,7 @@ const App = () => {
   }, [apiKey]);
 
   const onChangeCheck = (id: number) => {
-    console.log(id);
+    // console.log(id);
     const newData = prefactures.map((prefacture) => {
       if (prefacture.prefCode === id) {
         prefacture.checked = !prefacture.checked;
@@ -62,7 +62,7 @@ const App = () => {
     });
 
     setPrefactures(newData);
-    console.log(prefactures);
+    // console.log(prefactures);
   };
 
   return (
@@ -101,6 +101,7 @@ const App = () => {
           return null;
         })}
       </div>
+      <Rechart graphy={populations} />
     </div>
   );
 };
