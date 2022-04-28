@@ -14,21 +14,8 @@ type Population = {
   value: number;
 };
 
-const Rechart = (graphy: any) => {
-  const a = [];
-  for (let i = 0; i < graphy.graphy.length; i++) {
-    if (graphy.graphy[i] !== undefined) {
-      for (let j = 0; j < 18; j++) {
-        a.push({
-          year: graphy.graphy[i][j].year,
-          value: graphy.graphy[i][j].value,
-        });
-      }
-    }
-  }
-
-  console.log(a);
-
+const Rechart: React.FC<{ graphyData: string[] }> = ({ graphyData }) => {
+  console.log(graphyData);
   const data = [
     {
       name: "Page A",
@@ -79,7 +66,7 @@ const Rechart = (graphy: any) => {
       <LineChart
         width={730}
         height={250}
-        data={a}
+        data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
