@@ -26,9 +26,11 @@ const App = () => {
     const fetchPrefacture = (data: any) => {
       const arr: Prefecture[] = [];
       const result = data.result;
-      for (let i = 0; i < result.length; i++) {
-        arr.push(result[i]);
-        result[i].checked = false;
+      if (result) {
+        for (let i = 0; i < result.length; i++) {
+          arr.push(result[i]);
+          result[i].checked = false;
+        }
       }
       setPrefactures(arr);
       initPopulation(arr);
