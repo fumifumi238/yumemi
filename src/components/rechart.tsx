@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   CartesianGrid,
@@ -7,6 +7,8 @@ import {
   Tooltip,
   Legend,
   Line,
+  ResponsiveContainer,
+  Label,
 } from "recharts";
 
 export const fortySevenprefactures = [
@@ -64,56 +66,66 @@ type Population = {
 };
 
 type Data = {
+  [fortySevenprefactures in string]: number;
+} & {
   year: number;
-  prefactures: { [key: string]: number };
 };
 
 const Rechart: React.FC<{
   filterPopulations: { [key: string]: Population[] };
 }> = ({ filterPopulations }) => {
-  const data: Data[] = [];
+  const [data, setData] = useState<Data[]>([]);
+
+  const generateColor = () => {
+    const color = ((Math.random() * 0xffffff) | 0).toString(16);
+    const randomColor = "#" + ("000000" + color).slice(-6);
+    return randomColor;
+  };
 
   useEffect(() => {
-    Object.keys(filterPopulations).forEach((key) => {
-      for (let i = 0; i <= 17; i++) {
-        if (data[i].prefactures[key] === undefined) {
-          data[i].prefactures[key] = filterPopulations[key][i].value;
-        }
-      }
-    });
-  }, [filterPopulations, data]);
-
-  for (let i = 1960; i <= 2045; i += 5) {
-    data.push({ year: i, prefactures: {} });
-  }
+    const arr: Data[] = [];
+    for (let i = 0; i <= 17; i++) {
+      const hash: Data = { year: 1960 + i * 5 };
+      Object.keys(filterPopulations).forEach((key) => {
+        hash[key] = filterPopulations[key][i].value;
+      });
+      arr.push(hash);
+    }
+    setData(arr);
+  }, [filterPopulations]);
 
   return (
-    <>
+    <ResponsiveContainer width="80%" height={400}>
       <LineChart
-        width={730}
-        height={250}
         data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 30, left: 30, right: 0, bottom: 30 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="year" />
-        <YAxis />
+        <XAxis dataKey="year">
+          <Label value="year" position="insideBottom" />
+        </XAxis>
+        <YAxis
+          label={{
+            value: "population",
+            offset: 0,
+            position: "insideTopLeft",
+          }}
+        />
+
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="value" stroke="#82ca9d" />
-        <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-      </LineChart>
-      <div>
         {Object.keys(filterPopulations).map((key, index) => {
           return (
-            <li key={index}>
-              <p> {key}</p>
-              <p>{filterPopulations[key][0].value}</p>
-            </li>
+            <Line
+              type="monotone"
+              key={index}
+              dataKey={key}
+              stroke={generateColor()}
+            />
           );
         })}
-      </div>
-    </>
+      </LineChart>
+    </ResponsiveContainer>
   );
 };
 

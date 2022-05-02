@@ -79,7 +79,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <div className="box">
         <h1 className="title">Title</h1>
       </div>
@@ -102,20 +102,6 @@ const App = () => {
           );
         })}
       </ul>
-      <div>
-        {Object.keys(populations).map((key, index) => {
-          if (populations[key].length !== 0 && prefactures[index].checked) {
-            return (
-              <li key={index}>
-                <p> {populations[key][0].value}</p>
-                <p>{prefactures[index].prefName}</p>
-              </li>
-            );
-          }
-          return null;
-        })}
-      </div>
-
       <Rechart filterPopulations={filterpopulations} />
     </div>
   );
