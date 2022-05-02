@@ -18,6 +18,9 @@ const App = () => {
   const [populations, setPopulations] = useState<{
     [key: string]: Population[];
   }>({});
+  const [filterpopulations, setfilterPopulations] = useState<{
+    [key: string]: Population[];
+  }>({});
 
   useEffect(() => {
     const fetchPrefacture = (data: any) => {
@@ -32,6 +35,16 @@ const App = () => {
     };
     fetchApi("/api/v1/prefectures", fetchPrefacture);
   }, []);
+
+  useEffect(() => {
+    const copyPopulations = JSON.parse(JSON.stringify(populations));
+    Object.keys(copyPopulations).forEach((key, index) => {
+      if (populations[key].length === 0 || !prefactures[index].checked) {
+        delete copyPopulations[key];
+      }
+    });
+    setfilterPopulations(copyPopulations);
+  }, [prefactures, populations]);
 
   const initPopulation = (prefactures: Prefecture[]) => {
     const hash: { [key: string]: Population[] } = {};
@@ -62,13 +75,9 @@ const App = () => {
       }
       return prefacture;
     });
-
     setPrefactures(newData);
   };
 
-  const graphyData = Object.keys(populations).filter((key, index) => {
-    return populations[key].length !== 0 && prefactures[index].checked;
-  });
   return (
     <div>
       <div className="box">
@@ -106,7 +115,8 @@ const App = () => {
           return null;
         })}
       </div>
-      <Rechart graphyData={graphyData} />
+
+      <Rechart filterPopulations={filterpopulations} />
     </div>
   );
 };
