@@ -66,7 +66,6 @@ const App = () => {
           const fetchPopulation = (data: any) => {
             const newPopulations = JSON.parse(JSON.stringify(populations));
             newPopulations[prefacture.prefName] = data.result.data[0].data;
-            console.log(newPopulations[prefacture.prefName][0]);
             setPopulations(newPopulations);
           };
           fetchApi(
