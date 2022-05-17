@@ -38,6 +38,12 @@ const App = () => {
     fetchApi("/api/v1/prefectures", fetchPrefacture);
   }, []);
 
+  let count = 0;
+  const countUp = () => {
+    console.log(count++);
+  };
+  setInterval(countUp, 10000);
+
   useEffect(() => {
     const copyPopulations = JSON.parse(JSON.stringify(populations));
     Object.keys(copyPopulations).forEach((key, index) => {
