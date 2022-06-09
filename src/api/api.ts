@@ -1,4 +1,8 @@
-export const fetchApi = async <Response>(path: string, fetchData: (data: Response) => void) => {
+type Response<T> = {
+  result: T;
+};
+
+export const fetchApi = async <T>(path: string, fetchData: (data: Response<T>) => void) => {
   const url = `https://opendata.resas-portal.go.jp${path}`;
   const apiKey = process.env.REACT_APP_X_API_KEY;
   if (apiKey === undefined) {
@@ -9,6 +13,7 @@ export const fetchApi = async <Response>(path: string, fetchData: (data: Respons
       'x-api-key': apiKey,
     },
   });
-  const data = (await res.json()) as Response;
+  const data = (await res.json()) as Response<T>;
+  console.log(data);
   fetchData(data);
 };
