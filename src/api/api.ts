@@ -14,6 +14,5 @@ export const fetchApi = async <T>(path: string, fetchData: (data: Response<T>) =
     },
   });
   const data = (await res.json()) as Response<T>;
-  console.log(data);
   fetchData(data);
 };
