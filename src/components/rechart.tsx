@@ -67,8 +67,8 @@ const Rechart: React.FC<{
   const [data, setData] = useState<Data[]>([]);
 
   const generateColor = () => {
-    const color = ((Math.random() * 0xffffff) | 0).toString(16);
-    const randomColor = '#' + ('000000' + color).slice(-6);
+    const color = (Math.random() * 0xffffff).toString(16);
+    const randomColor = `#${`000000${color}`.slice(-6)}`;
     return randomColor;
   };
 
@@ -101,8 +101,8 @@ const Rechart: React.FC<{
 
         <Tooltip />
         <Legend />
-        {Object.keys(filterPopulations).map((key, index) => {
-          return <Line type="monotone" key={index} dataKey={key} stroke={generateColor()} />;
+        {Object.keys(filterPopulations).map((key) => {
+          return <Line type="monotone" key={key} dataKey={key} stroke={generateColor()} />;
         })}
       </LineChart>
     </ResponsiveContainer>
