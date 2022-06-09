@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { fetchApi } from "./api/api";
-import "./App.css";
-import Rechart from "./components/rechart";
+import React, { useEffect, useState } from 'react';
+import { fetchApi } from './api/api';
+import './App.css';
+import PrefactureInfo from './components/PrefactureInfo';
+
+import Rechart from './components/rechart';
+
 type Prefecture = {
   prefCode: number;
   prefName: string;
@@ -22,12 +25,23 @@ const App = () => {
     [key: string]: Population[];
   }>({});
 
+  const initPopulation = (prefectures: Prefecture[]) => {
+    const hash: { [key: string]: Population[] } = {};
+    for (let i = 0; i < prefectures.length; i++) {
+      hash[prefectures[i].prefName] = [];
+    }
+    setPopulations(hash);
+  };
+  type Response<T> = {
+    result: T;
+  };
+
   useEffect(() => {
-    const fetchPrefacture = (data: any) => {
+    const fetchPrefacture = <T,>(data: Response<T>) => {
       const arr: Prefecture[] = [];
-      const result = data.result;
+      const result = data.result as unknown as Prefecture[];
       if (result) {
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
           arr.push(result[i]);
           result[i].checked = false;
         }
@@ -35,11 +49,14 @@ const App = () => {
       setPrefactures(arr);
       initPopulation(arr);
     };
-    fetchApi("/api/v1/prefectures", fetchPrefacture);
+    const getApi = async () => {
+      await fetchApi('/api/v1/prefectures', fetchPrefacture);
+    };
+    void getApi();
   }, []);
 
   useEffect(() => {
-    const copyPopulations = JSON.parse(JSON.stringify(populations));
+    const copyPopulations = JSON.parse(JSON.stringify(populations)) as { [key: string]: Population[] };
     Object.keys(copyPopulations).forEach((key, index) => {
       if (populations[key].length === 0 || !prefactures[index].checked) {
         delete copyPopulations[key];
@@ -48,30 +65,26 @@ const App = () => {
     setfilterPopulations(copyPopulations);
   }, [prefactures, populations]);
 
-  const initPopulation = (prefactures: Prefecture[]) => {
-    const hash: { [key: string]: Population[] } = {};
-    for (let i = 0; i < prefactures.length; i++) {
-      hash[prefactures[i].prefName] = [];
-    }
-    setPopulations(hash);
+  type PopData = {
+    result: {
+      data: [data: { data: Population[] }];
+    };
   };
+
   const onChangeCheck = (id: number) => {
     const newData = prefactures.map((prefacture) => {
       if (prefacture.prefCode === id) {
         prefacture.checked = !prefacture.checked;
-        if (
-          prefacture.checked &&
-          populations[prefacture.prefName].length === 0
-        ) {
-          const fetchPopulation = (data: any) => {
-            const newPopulations = JSON.parse(JSON.stringify(populations));
+        if (prefacture.checked && populations[prefacture.prefName].length === 0) {
+          const fetchPopulation = (data: PopData) => {
+            const newPopulations = JSON.parse(JSON.stringify(populations)) as { [key: string]: Population[] };
             newPopulations[prefacture.prefName] = data.result.data[0].data;
             setPopulations(newPopulations);
           };
-          fetchApi(
-            `/api/v1/population/composition/perYear?prefCode=${id}`,
-            fetchPopulation
-          );
+          const getApi = async () => {
+            await fetchApi(`/api/v1/population/composition/perYear?prefCode=${id}`, fetchPopulation);
+          };
+          void getApi();
         }
       }
       return prefacture;
@@ -87,20 +100,7 @@ const App = () => {
       <p>都道府県</p>
       <ul className="d-flex">
         {prefactures.map((prefacture) => {
-          return (
-            <li key={prefacture.prefCode} style={{ width: "25%" }}>
-              {prefacture.prefCode}
-              <label htmlFor={prefacture.prefName}>
-                <input
-                  type="checkbox"
-                  defaultChecked={prefacture.checked}
-                  onClick={() => onChangeCheck(prefacture.prefCode)}
-                  id={prefacture.prefName}
-                />
-                {prefacture.prefName}
-              </label>
-            </li>
-          );
+          return <PrefactureInfo prefacture={prefacture} onChangeCheck={onChangeCheck} />;
         })}
       </ul>
       <Rechart filterPopulations={filterpopulations} />
